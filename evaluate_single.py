@@ -37,15 +37,22 @@ def pil_loader(path: str) -> Image.Image:
         img = Image.open(f)
         return img.convert('RGB')
 
-def evaluate_single_img(img_path):
+def evaluate_single_img(img_path,cls_type='osm_cls'):
     # load single image
     img = pil_loader(img_path)
     img = data_transforms['issues'](img)
     img = img.to(device)
     img = img.unsqueeze(0)
     # load model
-    model_ft = torch.load('./checkpoints/resnet18_epoch15_0.944.pth')
+    results = []
+    model_ft = None
+    if cls_type == 'osm_cls':
+        model_ft = torch.load('./checkpoints/resnet18_epoch15_0.944.pth')
+        results = ['footway','primary']
+    else:
+        model_ft = torch.load('./checkpoints/road_cls_resnet18_epoch15_0.976.pth')
+        results = ['nonroad','road']
     model_ft.eval()
     outputs = model_ft(img)
     _, preds = torch.max(outputs, 1)
-    return 'footway' if preds == 0 else 'primary'
+    return results[0] if preds == 0 else results[1]

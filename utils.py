@@ -18,6 +18,20 @@ def issues_csv_to_json():
         json.dump(issues, f)
 
 
+
+def get_neigh_dist(center):
+    """
+    center: (x,y) coordinate
+    """
+    neighbors = []
+    x, y = center
+    for i in range(-2,3):
+        for j in range(-2,3):
+            neighbors.append((x + i,y + j,max(abs(i),abs(j))))
+
+    return neighbors
+
+
 def get_grid_location():
     return (0, 0)
 
@@ -30,7 +44,6 @@ def update_scores(issue):
     #     score = base_score - (2 * dist)
     #     for stored_tile in stored_tiles:
     #         pass
-
 
 if __name__ == '__main__':
     issues_csv_to_json()
