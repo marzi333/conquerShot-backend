@@ -1,7 +1,43 @@
 import pandas as pd
 import json
+import math
 from database_utils import get_all_tiles, save_tiles
-from tile_longlat import deg2num
+
+"""
+Reference for deg2num and num2deg:
+https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames#Mathematics
+"""
+
+
+def deg2num(lat_deg: float, lon_deg: float, zoom: int) -> (int, int):
+    """
+    computes the (x,y) grid index in the OSM map for a given point
+    :param lat_deg: the latitude of a point
+    :param lon_deg: the longitude of a point
+    :param zoom: the zoom level of the map
+    :return: the gird indices
+    """
+    lat_rad = math.radians(lat_deg)
+    n = 2.0 ** zoom
+    xtile = int((lon_deg + 180.0) / 360.0 * n)
+    ytile = int((1.0 - math.asinh(math.tan(lat_rad)) / math.pi) / 2.0 * n)
+    return xtile, ytile
+
+
+def num2deg(x_tile: int, y_tile: int, zoom: int) -> (float, float):
+    """
+    computes the inverse of the above. Given the (x,y) grid indeces of a OSM map tile, the corersponding latidue and
+    longitude of the top-left tile-corner are computed
+    :param x_tile: the x index of the tile in the tile-grid
+    :param y_tile: the y index of the tile in the tile-grid
+    :param zoom: the zoom level of the map
+    :return: the latitude and longitude of the top-left corner of the tile cell
+    """
+    n = 2.0 ** zoom
+    lon_deg = x_tile / n * 360.0 - 180.0
+    lat_rad = math.atan(math.sinh(math.pi * (1 - 2 * y_tile / n)))
+    lat_deg = math.degrees(lat_rad)
+    return lat_deg, lon_deg
 
 
 def issues_csv_to_json() -> None:

@@ -2,9 +2,8 @@ from flask import Flask
 from flask import request, jsonify
 from database_utils import get_user_by_id, update_user, get_all_issues, update_issue, get_all_tiles
 from mlmodels.evaluate_single import evaluate_single_img
-from utils import update_scores, eval_tile_winner
+from utils import update_scores, eval_tile_winner, num2deg
 from flask_cors import cross_origin
-from tile_longlat import num2deg
 import os
 
 app = Flask(__name__)
