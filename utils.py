@@ -34,44 +34,49 @@ def get_neigh_dist(center):
 
 def update_scores(issue, user_id):
     grid_location = deg2num(issue["latitude"], issue["longitude"], 16)
-    neighbors = get_neigh_dist(grid_location)
+    neighbours = get_neigh_dist(grid_location)
+
     stored_tiles = []
-    new_tiles = []
     with open('data/tiles.json') as f:
         try:
             stored_tiles = json.load(f)
         except:
             print("No tiles yet. File empty")
-    for x, y, dist in neighbors:
+
+    new_tiles = []
+    for x, y, dist in neighbours:
         base_score = 10 - len(issue['submissions'])
         add_score = base_score - 2 * dist
-        new_tile = {
+        new_tiles.append({
             "x": x,
             "y": y,
             "scores": {
                 user_id: add_score
             }
-        }
-        if len(stored_tiles) != 0:
-            for tile in stored_tiles:
-                if (x, y) == (tile["x"], tile["y"]):
-                    if user_id in tile["scores"].keys():
-                        tile["scores"][user_id] += add_score
-                    else:
-                        tile["scores"][user_id] = add_score
-                    new_tile = tile
-        new_tiles.append(new_tile)
-    print(len(new_tiles))
+        })
+    final_tiles = []
+    for new_tile in new_tiles:
+        found_duplicate = False
+        for old_tile in stored_tiles:
+            if (new_tile["x"], new_tile["y"]) == (old_tile["x"], old_tile["y"]):
+                old_tile["scores"] = {k: new_tile["scores"].get(k, 0) + old_tile["scores"].get(k, 0) for k in
+                                      set(new_tile["scores"]) | set(old_tile["scores"])}
+                found_duplicate = True
+                break
+        if not found_duplicate:
+            final_tiles.append(new_tile)
+    final_tile_set = stored_tiles + final_tiles
+    print(len(final_tile_set))
     with open('data/tiles.json', "w") as f:
-        json.dump(new_tiles, f)
+        json.dump(final_tile_set, f)
 
 
 if __name__ == '__main__':
     test_issue = {
-        "longitude": 11.527965543942017,
-        "latitude": 48.14774795111176,
-        "image_id": 2947015848899610,
+        "longitude": 11.613106928911195,
+        "latitude": 48.17299008497127,
+        "image_id": 2096254440714769,
         "submissions": [],
         "modifier": 1
     }
-    update_scores(test_issue, "1")
+    update_scores(test_issue, "2")
