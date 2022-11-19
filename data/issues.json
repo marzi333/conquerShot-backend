@@ -10,7 +10,12 @@
     "longitude": 11.606248275586244,
     "latitude": 48.17566584451249,
     "image_id": 187098909929555,
-    "submissions": [],
+    "submissions": [
+      {
+        "user_id": 1,
+        "timestamp": 0
+      }
+    ],
     "modifier": 1
   },
   {

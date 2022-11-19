@@ -1,6 +1,7 @@
 from flask import Flask
 from flask import request, jsonify
 from database_utils import get_user, update_user, add_user, get_all_issues
+from evaluate_single import evaluate_single_img
 import json
 import os
 
@@ -41,7 +42,7 @@ def image_upload():
     file = files.get('image')
     path = os.path.join('IMAGES_TO_EVAL/', file.filename)
     file.save(path)
-    # TODO: call model with path
+    prediction = evaluate_single_img(path)
     return jsonify({
         'success': True,
         'file': 'Received'

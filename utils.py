@@ -18,5 +18,19 @@ def issues_csv_to_json():
         json.dump(issues, f)
 
 
+def get_grid_location():
+    return (0, 0)
+
+
+def update_scores(issue):
+    grid_location = get_grid_location()
+    # stored_tiles = []
+    # base_score = 0
+    # for x, y, dist in tiles:
+    #     score = base_score - (2 * dist)
+    #     for stored_tile in stored_tiles:
+    #         pass
+
+
 if __name__ == '__main__':
     issues_csv_to_json()
