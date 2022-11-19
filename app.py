@@ -2,10 +2,9 @@ from flask import Flask
 from flask import request, jsonify
 from database_utils import get_user, update_user, add_user, get_all_issues, update_issue, get_all_tiles
 from evaluate_single import evaluate_single_img
-from flask_cors import cross_origin, CORS
-from tile_longlat import deg2num, num2deg
-
-import json
+from utils import update_scores
+from flask_cors import cross_origin
+from tile_longlat import num2deg
 import os
 
 app = Flask(__name__)
@@ -62,13 +61,15 @@ def user():
 def image_upload():
     user_id = request.form["user_id"]
     issue_id = request.form["issue_id"]
-    update_issue(int(issue_id), user_id)
-    files = request.files
-    file = files.get('image')
+    file = request.files.get('image')
     path = os.path.join('IMAGES_TO_EVAL/', file.filename)
     file.save(path)
-    prediction = evaluate_single_img(path)
-
+    if evaluate_single_img(path, 'road-cls') == 'road':
+        issue = update_issue(int(issue_id), user_id)
+        update_scores(issue, user_id)
+        prediction = evaluate_single_img(path)
+    else:
+        return {'message': 'not a road'}, 400
     return jsonify({
         'success': True,
         'file': 'Received'

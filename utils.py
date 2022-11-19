@@ -71,12 +71,12 @@ def update_scores(issue, user_id):
         json.dump(final_tile_set, f)
 
 
-if __name__ == '__main__':
-    test_issue = {
-        "longitude": 11.613106928911195,
-        "latitude": 48.17299008497127,
-        "image_id": 2096254440714769,
-        "submissions": [],
-        "modifier": 1
-    }
-    update_scores(test_issue, "2")
+# if __name__ == '__main__':
+#     test_issue = {
+#         "longitude": 11.613106928911195,
+#         "latitude": 48.17299008497127,
+#         "image_id": 2096254440714769,
+#         "submissions": [],
+#         "modifier": 1
+#     }
+#     update_scores(test_issue, "2")

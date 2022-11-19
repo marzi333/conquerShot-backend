@@ -23,6 +23,7 @@ def update_issue(issue_id, user_id):
     old_issues.append(to_update)
     with open('data/issues.json', "w") as f:
         json.dump(old_issues, f)
+    return to_update
 
 
 def add_user(new_user: {}):
