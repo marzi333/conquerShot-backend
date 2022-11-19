@@ -1,4 +1,10 @@
 import math
+
+"""
+Reference for deg2num and num2deg:
+https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames#Mathematics
+"""
+
 def deg2num(lat_deg, lon_deg, zoom):
   lat_rad = math.radians(lat_deg)
   n = 2.0 ** zoom
