@@ -12,6 +12,10 @@ app = Flask(__name__)
 @app.route('/issues', methods=['GET'])
 @cross_origin(origin='localhost', headers=['Content-Type', 'Authorization'])
 def get_issues():
+    """
+    endpoint for the issues object, queries all issues from the database
+    :return: a list of issue objects in JSON format
+    """
     issues = get_all_issues()
     return jsonify(issues)
 
@@ -19,6 +23,10 @@ def get_issues():
 @app.route('/tiles', methods=['GET'])
 @cross_origin(origin='localhost', headers=['Content-Type', 'Authorization'])
 def get_tiles():
+    """
+    endpoint for the tile objects, queries the tiles from the database and converts them for the frontend
+    :return: a list of tile objects in JSON format
+    """
     tiles = get_all_tiles()
     to_send = [
         {
@@ -32,9 +40,13 @@ def get_tiles():
     return jsonify(to_send)
 
 
-@app.route('/users', methods=['GET', 'POST', 'PUT'])
+@app.route('/users', methods=['GET', 'PUT'])
 @cross_origin(origin='localhost', headers=['Content-Type', 'Authorization'])
 def user():
+    """
+    endpoint for the user objects
+    :return: the user objects for GET, 200 on update success and 400 for incorrect operation
+    """
     user_id = request.args.get('user_id')
     if request.method == 'GET':
         user = get_user_by_id(user_id)
@@ -50,6 +62,11 @@ def user():
 @app.route('/image/upload', methods=['POST'])
 @cross_origin(origin='localhost', headers=['Content-Type', 'Authorization'])
 def image_upload():
+    """
+    receives an image, the user_id and current issue_id from the backend, evaluates the image using
+    a computer-vision model and updates the tiles and influence if the image was accepted
+    :return: 200 success if image was accepted, 500 if computer-vision model deems the image as unsatisfactory
+    """
     user_id = request.form["user_id"]
     issue_id = request.form["issue_id"]
     file = request.files.get('image')
