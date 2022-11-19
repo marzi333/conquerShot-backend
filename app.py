@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, Response
 from flask import request, jsonify
 from database_utils import get_user_by_id, update_user, get_all_issues, update_issue, get_all_tiles
 from mlmodels.evaluate_single import evaluate_single_img
@@ -78,9 +78,9 @@ def image_upload():
         issue = update_issue(issue_id, user_id)
         update_scores(issue, user_id)
         evaluate_single_img(path)
-        return {"message:" 'success'}, 200
+        return Response("{'message': 'success'}", status=200, mimetype='application/json')
     else:
-        return {'message': 'not a road'}, 400
+        return Response("{'message': 'not a road'}", status=400, mimetype='application/json')
 
 
 @app.route('/leaderboard', methods=['GET'])
