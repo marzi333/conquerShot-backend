@@ -1,5 +1,7 @@
 import pandas as pd
 import json
+
+from database_utils import get_all_tiles, save_tiles
 from tile_longlat import deg2num
 
 
@@ -10,9 +12,8 @@ def issues_csv_to_json():
         curr_issue = {
             'longitude': row.longitude,
             'latitude': row.latitude,
-            'image_id': row.image_id,
-            'submissions': [],
-            'modifier': 1
+            'image_id': str(row.image_id),
+            'submissions': []
         }
         issues.append(curr_issue)
     with open("data/issues.json", "w") as f:
@@ -35,14 +36,7 @@ def get_neigh_dist(center):
 def update_scores(issue, user_id):
     grid_location = deg2num(issue["latitude"], issue["longitude"], 16)
     neighbours = get_neigh_dist(grid_location)
-
-    stored_tiles = []
-    with open('data/tiles.json') as f:
-        try:
-            stored_tiles = json.load(f)
-        except:
-            print("No tiles yet. File empty")
-
+    stored_tiles = get_all_tiles()
     new_tiles = []
     for x, y, dist in neighbours:
         base_score = 10 - len(issue['submissions'])
@@ -57,26 +51,13 @@ def update_scores(issue, user_id):
     final_tiles = []
     for new_tile in new_tiles:
         found_duplicate = False
-        for old_tile in stored_tiles:
-            if (new_tile["x"], new_tile["y"]) == (old_tile["x"], old_tile["y"]):
-                old_tile["scores"] = {k: new_tile["scores"].get(k, 0) + old_tile["scores"].get(k, 0) for k in
-                                      set(new_tile["scores"]) | set(old_tile["scores"])}
-                found_duplicate = True
-                break
-        if not found_duplicate:
-            final_tiles.append(new_tile)
-    final_tile_set = stored_tiles + final_tiles
-    print(len(final_tile_set))
-    with open('data/tiles.json', "w") as f:
-        json.dump(final_tile_set, f)
-
-
-# if __name__ == '__main__':
-#     test_issue = {
-#         "longitude": 11.613106928911195,
-#         "latitude": 48.17299008497127,
-#         "image_id": 2096254440714769,
-#         "submissions": [],
-#         "modifier": 1
-#     }
-#     update_scores(test_issue, "2")
+        if len(stored_tiles) != 0:
+            for old_tile in stored_tiles:
+                if (new_tile["x"], new_tile["y"]) == (old_tile["x"], old_tile["y"]):
+                    old_tile["scores"] = {k: new_tile["scores"].get(k, 0) + old_tile["scores"].get(k, 0) for k in
+                                          set(new_tile["scores"]) | set(old_tile["scores"])}
+                    found_duplicate = True
+                    break
+            if not found_duplicate:
+                final_tiles.append(new_tile)
+    save_tiles(stored_tiles + final_tiles)
