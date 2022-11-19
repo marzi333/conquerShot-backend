@@ -17,7 +17,6 @@ def hello():
 
 @app.route('/issues', methods=['GET'])
 @cross_origin(origin='localhost', headers=['Content- Type', 'Authorization'])
-
 def get_issues():
     issues = get_all_issues()
     return jsonify(issues)
@@ -25,7 +24,6 @@ def get_issues():
 
 @app.route('/users', methods=['GET', 'POST', 'PUT'])
 @cross_origin(origin='localhost', headers=['Content- Type', 'Authorization'])
-
 def user():
     user_id = request.args.get('user_id')
     if request.method == 'GET':
