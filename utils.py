@@ -1,11 +1,14 @@
 import pandas as pd
 import json
-
 from database_utils import get_all_tiles, save_tiles
 from tile_longlat import deg2num
 
 
-def issues_csv_to_json():
+def issues_csv_to_json() -> None:
+    """
+    convert the issues in the csv file to json objects
+    and write it to a file
+    """
     df = pd.read_csv('./issues.csv')
     issues = []
     for idx, row in df.iterrows():
@@ -20,20 +23,26 @@ def issues_csv_to_json():
         json.dump(issues, f)
 
 
-def get_neigh_dist(center):
+def get_neighbour_tiles(center: (int, int)) -> [(int, int, int)]:
     """
     center: (x,y) coordinate
+    :return a list of neighbour tuples of shape (x,y,dist_to_center)
     """
     neighbors = []
     x, y = center
     for i in range(-2, 3):
         for j in range(-2, 3):
+            # (x, y coordinate of neighbour, distance to center)
             neighbors.append((x + i, y + j, max(abs(i), abs(j))))
-
     return neighbors
 
 
-def evaluate_tile_winner(tile):
+def eval_tile_winner(tile: {}) -> [str]:
+    """
+    takes the user tile scores and returns the winner/tiles
+    :param tile: the tile object
+    :return: a list of winners (one if there is no tie)
+    """
     max_score = tile["scores"].values()
     if tile["scores"].values().count(max_score) > 1:
         ties = []
@@ -45,9 +54,15 @@ def evaluate_tile_winner(tile):
         return [max(tile["scores"], key=tile["scores"].get)]
 
 
-def update_scores(issue, user_id):
+def update_scores(issue: {}, user_id: str) -> None:
+    """
+    for a given issue, updates all relevant tiles if a new user submits an image
+    :param issue: the issue object
+    :param user_id: the id of the user
+    updates are directly saved to the database
+    """
     grid_location = deg2num(issue["latitude"], issue["longitude"], 16)
-    neighbours = get_neigh_dist(grid_location)
+    neighbours = get_neighbour_tiles(grid_location)
     stored_tiles = get_all_tiles()
     new_tiles = []
     for x, y, dist in neighbours:
