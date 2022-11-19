@@ -2,7 +2,7 @@ from flask import Flask
 from flask import request, jsonify
 from database_utils import get_user_by_id, update_user, get_all_issues, update_issue, get_all_tiles
 from mlmodels.evaluate_single import evaluate_single_img
-from utils import update_scores
+from utils import update_scores, evaluate_tile_winner
 from flask_cors import cross_origin
 from tile_longlat import num2deg
 import os
@@ -21,13 +21,14 @@ def get_issues():
 @cross_origin(origin='localhost', headers=['Content-Type', 'Authorization'])
 def get_tiles():
     tiles = get_all_tiles()
+
     to_send = [
         {
             "bounds": [
                 num2deg(tile["x"], tile["y"], 16),
                 num2deg(tile["x"] + 1, tile["y"] + 1, 16)
             ],
-            "user_id": max(tile["scores"], key=tile["scores"].get)
+            "user_ids": evaluate_tile_winner(tile)
         } for tile in tiles
     ]
     return jsonify(to_send)
@@ -57,7 +58,7 @@ def image_upload():
     path = os.path.join('IMAGES_TO_EVAL/', file.filename)
     file.save(path)
     if evaluate_single_img(path, 'road-cls') == 'road':
-        issue = update_issue(int(issue_id), user_id)
+        issue = update_issue(issue_id, user_id)
         update_scores(issue, user_id)
         evaluate_single_img(path)
         return {"message:" 'success'}, 200

@@ -33,6 +33,18 @@ def get_neigh_dist(center):
     return neighbors
 
 
+def evaluate_tile_winner(tile):
+    max_score = tile["scores"].values()
+    if tile["scores"].values().count(max_score) > 1:
+        ties = []
+        for user_id, score in tile["scores"].items():
+            if score == max_score:
+                ties.append(user_id)
+        return ties
+    else:
+        return [max(tile["scores"], key=tile["scores"].get)]
+
+
 def update_scores(issue, user_id):
     grid_location = deg2num(issue["latitude"], issue["longitude"], 16)
     neighbours = get_neigh_dist(grid_location)
