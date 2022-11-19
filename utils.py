@@ -114,13 +114,12 @@ def update_scores(issue: {}, user_id: str) -> None:
     final_tiles = []
     for new_tile in new_tiles:
         found_duplicate = False
-        if len(stored_tiles) != 0:
-            for old_tile in stored_tiles:
-                if (new_tile["x"], new_tile["y"]) == (old_tile["x"], old_tile["y"]):
-                    old_tile["scores"] = {k: new_tile["scores"].get(k, 0) + old_tile["scores"].get(k, 0) for k in
-                                          set(new_tile["scores"]) | set(old_tile["scores"])}
-                    found_duplicate = True
-                    break
-            if not found_duplicate:
-                final_tiles.append(new_tile)
+        for old_tile in stored_tiles:
+            if (new_tile["x"], new_tile["y"]) == (old_tile["x"], old_tile["y"]):
+                old_tile["scores"] = {k: new_tile["scores"].get(k, 0) + old_tile["scores"].get(k, 0) for k in
+                                      set(new_tile["scores"]) | set(old_tile["scores"])}
+                found_duplicate = True
+                break
+        if not found_duplicate:
+            final_tiles.append(new_tile)
     save_tiles(stored_tiles + final_tiles)
