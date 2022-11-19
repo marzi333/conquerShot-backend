@@ -83,5 +83,24 @@ def image_upload():
         return {'message': 'not a road'}, 400
 
 
+@app.route('/leaderboard', methods=['GET'])
+@cross_origin(origin='localhost', headers=['Content-Type', 'Authorization'])
+def get_leaderboard_scores():
+    """
+    accumulates all influence points for all tiles for each user
+    :return: returns the total (leaderboard) score for each user
+    """
+    tiles = get_all_tiles()
+    final_scores = {}
+    for tile in tiles:
+        scores = tile["scores"]
+        for user_id, score in scores.items():
+            if user_id in final_scores.keys():
+                final_scores[user_id] += score
+            else:
+                final_scores[user_id] = score
+    return jsonify(final_scores)
+
+
 if __name__ == '__main__':
     app.run(debug=False)
