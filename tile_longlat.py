@@ -1,4 +1,10 @@
 import math
+
+"""
+Reference for deg2num and num2deg:
+https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames#Mathematics
+"""
+
 def deg2num(lat_deg, lon_deg, zoom):
   lat_rad = math.radians(lat_deg)
   n = 2.0 ** zoom
@@ -13,8 +19,9 @@ def num2deg(xtile, ytile, zoom):
   lat_deg = math.degrees(lat_rad)
   return (lat_deg, lon_deg)
 
-
-
+"""
+Returns the Latitude and Longitude of the upper left corner of the current tile:
+"""
 def tilecorner_longlat(issue_latitude, issue_longitude):
    [xtile,ytile] = deg2num(48.111355593621, 11.61430161647960, 16)
    [lat_corner,long_corner] = num2deg(xtile, ytile, 16)
