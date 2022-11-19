@@ -1,6 +1,6 @@
 from flask import Flask
 from flask import request, jsonify
-from database_utils import get_user, update_user, add_user, get_all_issues, update_issue, get_all_tiles
+from database_utils import get_user, update_user, get_all_issues, update_issue, get_all_tiles
 from evaluate_single import evaluate_single_img
 from utils import update_scores
 from flask_cors import cross_origin
@@ -10,20 +10,15 @@ import os
 app = Flask(__name__)
 
 
-@app.route('/')
-def hello():
-    return 'Hello, World!'
-
-
 @app.route('/issues', methods=['GET'])
-@cross_origin(origin='localhost', headers=['Content- Type', 'Authorization'])
+@cross_origin(origin='localhost', headers=['Content-Type', 'Authorization'])
 def get_issues():
     issues = get_all_issues()
     return jsonify(issues)
 
 
 @app.route('/tiles', methods=['GET'])
-@cross_origin(origin='localhost', headers=['Content- Type', 'Authorization'])
+@cross_origin(origin='localhost', headers=['Content-Type', 'Authorization'])
 def get_tiles():
     tiles = get_all_tiles()
     to_send = [
@@ -39,25 +34,22 @@ def get_tiles():
 
 
 @app.route('/users', methods=['GET', 'POST', 'PUT'])
-@cross_origin(origin='localhost', headers=['Content- Type', 'Authorization'])
+@cross_origin(origin='localhost', headers=['Content-Type', 'Authorization'])
 def user():
     user_id = request.args.get('user_id')
     if request.method == 'GET':
         user = get_user(user_id)
         return jsonify(user)
-    elif request.method == 'POST':
-        new_user = request.form
-        add_user(new_user)
     elif request.method == 'PUT':
         updated_user = request.form
         update_user(updated_user)
+        return {'message': 'update success'}, 200
     else:
-        # POST Error 405 Method Not Allowed
-        pass
+        return {'message': 'not a road'}, 400
 
 
 @app.route('/image/upload', methods=['POST'])
-@cross_origin(origin='localhost', headers=['Content- Type', 'Authorization'])
+@cross_origin(origin='localhost', headers=['Content-Type', 'Authorization'])
 def image_upload():
     user_id = request.form["user_id"]
     issue_id = request.form["issue_id"]
@@ -67,7 +59,7 @@ def image_upload():
     if evaluate_single_img(path, 'road-cls') == 'road':
         issue = update_issue(int(issue_id), user_id)
         update_scores(issue, user_id)
-        prediction = evaluate_single_img(path)
+        evaluate_single_img(path)
         return jsonify(get_all_tiles())
     else:
         return {'message': 'not a road'}, 400

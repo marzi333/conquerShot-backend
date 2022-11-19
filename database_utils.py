@@ -25,13 +25,6 @@ def update_issue(issue_id, user_id):
     return to_update
 
 
-def add_user(new_user: {}):
-    with open('data/users.json') as f:
-        users = json.load(f)
-        users.append(new_user)
-        json.dump(users, f)
-
-
 def get_user(user_id):
     with open('data/users.json') as f:
         users = json.load(f)
