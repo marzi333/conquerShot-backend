@@ -11,7 +11,7 @@ app = Flask(__name__)
 
 
 @app.route('/issues', methods=['GET'])
-@cross_origin(origin='localhost', headers=[fk'Content-Type', 'Authorization'])
+@cross_origin(origin='localhost', headers=['Content-Type', 'Authorization'])
 def get_issues():
     issues = get_all_issues()
     return jsonify(issues)
