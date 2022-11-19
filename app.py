@@ -1,6 +1,9 @@
 from flask import Flask
 from flask import request, jsonify
 from database_utils import get_user, update_user, add_user, get_all_issues
+from evaluate_single import evaluate_single_img
+from flask_cors import cross_origin, CORS
+
 import json
 import os
 
@@ -13,12 +16,14 @@ def hello():
 
 
 @app.route('/issues', methods=['GET'])
+@cross_origin(origin='localhost', headers=['Content- Type', 'Authorization'])
 def get_issues():
     issues = get_all_issues()
     return jsonify(issues)
 
 
 @app.route('/users', methods=['GET', 'POST', 'PUT'])
+@cross_origin(origin='localhost', headers=['Content- Type', 'Authorization'])
 def user():
     user_id = request.args.get('user_id')
     if request.method == 'GET':
@@ -36,12 +41,14 @@ def user():
 
 
 @app.route('/image/upload', methods=['POST'])
+@cross_origin(origin='localhost', headers=['Content- Type', 'Authorization'])
 def image_upload():
+    user_id = request.args.get('user_id')
     files = request.files
     file = files.get('image')
     path = os.path.join('IMAGES_TO_EVAL/', file.filename)
     file.save(path)
-    # TODO: call model with path
+    prediction = evaluate_single_img(path)
     return jsonify({
         'success': True,
         'file': 'Received'
