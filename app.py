@@ -25,7 +25,8 @@ def get_issues():
 def get_tiles():
     """
     endpoint for the tile objects, queries the tiles from the database and converts them for the frontend
-    :return: a list of tile objects in JSON format
+    :return: a list of tile objects, with boundaries for plotting, the winner of the tile and the max score at a given
+    tile in the frontend in JSON format
     """
     tiles = get_all_tiles()
     to_send = [
@@ -34,7 +35,8 @@ def get_tiles():
                 num2deg(tile["x"], tile["y"], 16),
                 num2deg(tile["x"] + 1, tile["y"] + 1, 16)
             ],
-            "user_ids": eval_tile_winner(tile)
+            "user_ids": eval_tile_winner(tile),
+            "max_score": max(tile["scores"].values())
         } for tile in tiles
     ]
     return jsonify(to_send)
