@@ -1,4 +1,6 @@
 import json
+import time
+
 
 def update_user(updated_user: {}):
     with open('data/users.json', "w") as f:
@@ -6,6 +8,21 @@ def update_user(updated_user: {}):
         users = [u for u in users if u['id'] != updated_user["id"]]
         users.append(updated_user)
         json.dump(users, f)
+
+
+def update_issue(issue_id, user_id):
+    with open('data/issues.json', "r") as f:
+        issues = json.load(f)
+    print(type(issues[0]['image_id']))
+    old_issues = [i for i in issues if i['image_id'] != issue_id]
+    to_update = [i for i in issues if i['image_id'] == issue_id][0]
+    to_update["submissions"].append({
+        "user_id": user_id,
+        "timestamp": int(time.time())
+    })
+    old_issues.append(to_update)
+    with open('data/issues.json', "w") as f:
+        json.dump(old_issues, f)
 
 
 def add_user(new_user: {}):
@@ -26,3 +43,9 @@ def get_all_issues():
     with open('data/issues.json') as f:
         issues = json.load(f)
     return issues
+
+
+def get_all_tiles():
+    with open('data/tiles.json') as f:
+        tiles = json.load(f)
+    return tiles
