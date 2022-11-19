@@ -44,7 +44,7 @@ data_transforms = {
 }
 
 
-def evaluate(model, dataloaders, cls_type):
+def evaluate(model, dataloaders, cls_type, phase):
     
     model.eval()   # Set model to evaluate mode
     results = dict()
@@ -67,7 +67,7 @@ def evaluate(model, dataloaders, cls_type):
         print(k.split('/')[-1],v)
 
     # output the results into csv files
-    with open(f'./{cls_type}_results.csv','w') as f:
+    with open(f'./{cls_type}_{phase}_results.csv','w') as f:
         writer = csv.writer(f)
         if cls_type == 'osm_cls':
             writer.writerow(['image_id','highway']) # title
@@ -107,4 +107,4 @@ if __name__ == '__main__':
     dataloaders_dict = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=batch_size, num_workers=4) for x in [phase]}
 
     model_ft = torch.load(model_path)
-    evaluate(model_ft, dataloaders_dict,cls_type)
+    evaluate(model_ft, dataloaders_dict,cls_type,phase)
