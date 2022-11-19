@@ -2,7 +2,7 @@ from flask import Flask
 from flask import request, jsonify
 from database_utils import get_user_by_id, update_user, get_all_issues, update_issue, get_all_tiles
 from mlmodels.evaluate_single import evaluate_single_img
-from utils import update_scores, evaluate_tile_winner
+from utils import update_scores, eval_tile_winner
 from flask_cors import cross_origin
 from tile_longlat import num2deg
 import os
@@ -21,14 +21,13 @@ def get_issues():
 @cross_origin(origin='localhost', headers=['Content-Type', 'Authorization'])
 def get_tiles():
     tiles = get_all_tiles()
-
     to_send = [
         {
             "bounds": [
                 num2deg(tile["x"], tile["y"], 16),
                 num2deg(tile["x"] + 1, tile["y"] + 1, 16)
             ],
-            "user_ids": evaluate_tile_winner(tile)
+            "user_ids": eval_tile_winner(tile)
         } for tile in tiles
     ]
     return jsonify(to_send)
