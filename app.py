@@ -41,7 +41,9 @@ def user():
 
 
 @app.route('/image/upload', methods=['POST'])
+@cross_origin(origin='localhost', headers=['Content- Type', 'Authorization'])
 def image_upload():
+    user_id = request.args.get('user_id')
     files = request.files
     file = files.get('image')
     path = os.path.join('IMAGES_TO_EVAL/', file.filename)
