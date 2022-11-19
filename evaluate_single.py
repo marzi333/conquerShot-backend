@@ -45,6 +45,7 @@ def evaluate_single_img(img_path,cls_type='osm_cls'):
     img = img.unsqueeze(0)
     # load model
     results = []
+    model_ft = None
     if cls_type == 'osm_cls':
         model_ft = torch.load('./checkpoints/resnet18_epoch15_0.944.pth')
         results = ['footway','primary']
