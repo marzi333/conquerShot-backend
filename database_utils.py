@@ -13,7 +13,6 @@ def update_user(updated_user: {}):
 def update_issue(issue_id, user_id):
     with open('data/issues.json', "r") as f:
         issues = json.load(f)
-    print(type(issues[0]['image_id']))
     old_issues = [i for i in issues if i['image_id'] != issue_id]
     to_update = [i for i in issues if i['image_id'] == issue_id][0]
     to_update["submissions"].append({
@@ -48,5 +47,8 @@ def get_all_issues():
 
 def get_all_tiles():
     with open('data/tiles.json') as f:
-        tiles = json.load(f)
-    return tiles
+        try:
+            tiles = json.load(f)
+            return tiles
+        except:
+            print("No tiles yet. File empty")

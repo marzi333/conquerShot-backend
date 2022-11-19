@@ -68,12 +68,9 @@ def image_upload():
         issue = update_issue(int(issue_id), user_id)
         update_scores(issue, user_id)
         prediction = evaluate_single_img(path)
+        return jsonify(get_all_tiles())
     else:
         return {'message': 'not a road'}, 400
-    return jsonify({
-        'success': True,
-        'file': 'Received'
-    })
 
 
 if __name__ == '__main__':
