@@ -1,5 +1,6 @@
 from flask import Flask
 from flask import request, jsonify
+from database_utils import get_user, update_user, add_user, get_all_issues
 import json
 import os
 
@@ -12,29 +13,23 @@ def hello():
 
 
 @app.route('/issues', methods=['GET'])
-def get_all_issues():
-    with open('issues.json') as f:
-        issues = json.load(f)
+def get_issues():
+    issues = get_all_issues()
     return jsonify(issues)
 
 
-@app.route('/users', methods=['GET', 'POST'])
+@app.route('/users', methods=['GET', 'POST', 'PUT'])
 def user():
     user_id = request.args.get('user_id')
     if request.method == 'GET':
-        with open('users.json') as f:
-            users = json.load(f)
-        print(users)
-        user = list(filter(lambda u: u['id'] == int(user_id), users))[0]
+        user = get_user(user_id)
         return jsonify(user)
-    if request.method == 'POST':
+    elif request.method == 'POST':
+        new_user = request.form
+        add_user(new_user)
+    elif request.method == 'PUT':
         updated_user = request.form
-        with open('users.json') as f:
-            users = json.load(f)
-        users = [u for u in users if u['id'] != updated_user["id"]]
-        users.append(updated_user)
-        with open("users.json", "w") as f:
-            json.dump(users, f)
+        update_user(updated_user)
     else:
         # POST Error 405 Method Not Allowed
         pass

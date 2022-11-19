@@ -14,7 +14,7 @@ def issues_csv_to_json():
             'modifier': 1
         }
         issues.append(curr_issue)
-    with open("issues.json", "w") as f:
+    with open("data/issues.json", "w") as f:
         json.dump(issues, f)
 
 
