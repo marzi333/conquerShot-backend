@@ -79,8 +79,8 @@ def eval_tile_winner(tile: {}) -> [str]:
     :param tile: the tile object
     :return: a list of winners (one if there is no tie)
     """
-    max_score = tile["scores"].values()
-    if tile["scores"].values().count(max_score) > 1:
+    max_score = max(tile["scores"].values())
+    if list(tile["scores"].values()).count(max_score) > 1:
         ties = []
         for user_id, score in tile["scores"].items():
             if score == max_score:
