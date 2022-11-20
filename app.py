@@ -2,7 +2,7 @@ from flask import Flask, Response
 from flask import request, jsonify
 from database_utils import get_user_by_id, update_user, get_all_issues, update_issue, get_all_tiles
 from mlmodels.evaluate_single import evaluate_single_img
-from utils import update_scores, eval_tile_winner, num2deg
+from utils import update_scores, eval_tile_winner, num2deg, compute_user_total_score
 from flask_cors import cross_origin
 import os
 
@@ -44,7 +44,7 @@ def get_tiles():
 
 @app.route('/users', methods=['GET', 'PUT'])
 @cross_origin(origin='localhost', headers=['Content-Type', 'Authorization'])
-def user():
+def get_update_user():
     """
     endpoint for the user objects
     :return: the user objects for GET, 200 on update success and 400 for incorrect operation
@@ -77,6 +77,9 @@ def image_upload():
     if evaluate_single_img(path, 'road-cls') == 'road':
         issue = update_issue(issue_id, user_id)
         update_scores(issue, user_id)
+        user = get_user_by_id(user_id)
+        user["score"] = compute_user_total_score(user_id)
+        update_user(user)
         evaluate_single_img(path)
         return Response("{'message': 'success'}", status=200, mimetype='application/json')
     else:
