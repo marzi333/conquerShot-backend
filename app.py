@@ -2,7 +2,7 @@ from flask import Flask, Response
 from flask import request, jsonify
 from database_utils import get_user_by_id, update_user, get_all_issues, update_issue, get_all_tiles
 from mlmodels.evaluate_single import evaluate_single_img
-from utils import update_scores, eval_tile_winner, num2deg, compute_user_total_score
+from utils import update_scores, eval_tile_winner, num2deg, compute_user_total_score, compute_user_min_max_tile_score
 from flask_cors import cross_origin
 import os
 
@@ -29,16 +29,33 @@ def get_tiles():
     tile in the frontend in JSON format
     """
     tiles = get_all_tiles()
-    to_send = [
-        {
-            "bounds": [
-                num2deg(tile["x"], tile["y"], 16),
-                num2deg(tile["x"] + 1, tile["y"] + 1, 16)
-            ],
-            "user_ids": eval_tile_winner(tile),
-            "max_score": max(tile["scores"].values())
-        } for tile in tiles
-    ]
+    to_send = []
+    for tile in tiles:
+        tile_owners = eval_tile_winner(tile)
+        if len(tile_owners) == 1:
+            user_min_max = compute_user_min_max_tile_score(tile_owners[0])
+            to_send.append(
+                {
+                    "bounds": [
+                        num2deg(tile["x"], tile["y"], 16),
+                        num2deg(tile["x"] + 1, tile["y"] + 1, 16)
+                    ],
+                    "user_ids": tile_owners,
+                    "opacity": (0.6 - 0.2) * (tile["scores"][tile_owners[0]] - user_min_max[0]) / (
+                                user_min_max[1] - user_min_max[0]) + 0.2
+                }
+            )
+        else:
+            to_send.append(
+                {
+                    "bounds": [
+                        num2deg(tile["x"], tile["y"], 16),
+                        num2deg(tile["x"] + 1, tile["y"] + 1, 16)
+                    ],
+                    "user_ids": tile_owners,
+                    "opacity": 0.5
+                }
+            )
     return jsonify(to_send)
 
 

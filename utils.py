@@ -55,7 +55,7 @@ def issues_csv_to_json() -> None:
             'latitude': row.latitude,
             'image_id': str(row.image_id),
             'submissions': [],
-            'icon': random.choice(['tower','castle','village'])
+            'icon': random.choice(['tower', 'castle', 'village'])
         }
         issues.append(curr_issue)
     with open("data/issues.json", "w") as f:
@@ -105,6 +105,24 @@ def compute_user_total_score(user_id: str) -> int:
         if user_id in tile["scores"].keys():
             total_score += tile["scores"][user_id]
     return total_score
+
+
+def compute_user_min_max_tile_score(user_id: str) -> (int, int):
+    """
+    gets a users min and max value of all his tiles
+    :param user_id: the user id
+    :return: the min and max scores overall the users tiles
+    """
+    tiles = get_all_tiles()
+    min_score = 999999
+    max_score = 0
+    for tile in tiles:
+        if user_id in tile["scores"].keys():
+            if tile["scores"][user_id] < min_score:
+                min_score = tile["scores"][user_id]
+            if tile["scores"][user_id] > max_score:
+                max_score = tile["scores"][user_id]
+    return min_score, max_score
 
 
 def update_scores(issue: {}, user_id: str) -> None:
