@@ -47,10 +47,10 @@ def evaluate_single_img(img_path,cls_type='osm_cls'):
     results = []
     model_ft = None
     if cls_type == 'osm_cls':
-        model_ft = torch.load('./checkpoints/resnet18_epoch15_0.944.pth')
+        model_ft = torch.load('mlmodels/checkpoints/resnet18_epoch15_0.944.pth')
         results = ['footway','primary']
     else:
-        model_ft = torch.load('./checkpoints/road_cls_resnet18_epoch15_0.976.pth')
+        model_ft = torch.load('mlmodels/checkpoints/road_cls_resnet18_epoch15_0.976.pth')
         results = ['nonroad','road']
     model_ft.eval()
     outputs = model_ft(img)

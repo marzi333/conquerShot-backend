@@ -1,10 +1,9 @@
-from flask import Flask
+from flask import Flask, Response
 from flask import request, jsonify
 from database_utils import get_user_by_id, update_user, get_all_issues, update_issue, get_all_tiles
 from mlmodels.evaluate_single import evaluate_single_img
-from utils import update_scores
+from utils import update_scores, eval_tile_winner, num2deg, compute_user_total_score
 from flask_cors import cross_origin
-from tile_longlat import num2deg
 import os
 
 app = Flask(__name__)
@@ -13,6 +12,10 @@ app = Flask(__name__)
 @app.route('/issues', methods=['GET'])
 @cross_origin(origin='localhost', headers=['Content-Type', 'Authorization'])
 def get_issues():
+    """
+    endpoint for the issues object, queries all issues from the database
+    :return: a list of issue objects in JSON format
+    """
     issues = get_all_issues()
     return jsonify(issues)
 
@@ -20,6 +23,11 @@ def get_issues():
 @app.route('/tiles', methods=['GET'])
 @cross_origin(origin='localhost', headers=['Content-Type', 'Authorization'])
 def get_tiles():
+    """
+    endpoint for the tile objects, queries the tiles from the database and converts them for the frontend
+    :return: a list of tile objects, with boundaries for plotting, the winner of the tile and the max score at a given
+    tile in the frontend in JSON format
+    """
     tiles = get_all_tiles()
     to_send = [
         {
@@ -27,15 +35,20 @@ def get_tiles():
                 num2deg(tile["x"], tile["y"], 16),
                 num2deg(tile["x"] + 1, tile["y"] + 1, 16)
             ],
-            "user_id": max(tile["scores"], key=tile["scores"].get)
+            "user_ids": eval_tile_winner(tile),
+            "max_score": max(tile["scores"].values())
         } for tile in tiles
     ]
     return jsonify(to_send)
 
 
-@app.route('/users', methods=['GET', 'POST', 'PUT'])
+@app.route('/users', methods=['GET', 'PUT'])
 @cross_origin(origin='localhost', headers=['Content-Type', 'Authorization'])
-def user():
+def get_update_user():
+    """
+    endpoint for the user objects
+    :return: the user objects for GET, 200 on update success and 400 for incorrect operation
+    """
     user_id = request.args.get('user_id')
     if request.method == 'GET':
         user = get_user_by_id(user_id)
@@ -51,18 +64,45 @@ def user():
 @app.route('/image/upload', methods=['POST'])
 @cross_origin(origin='localhost', headers=['Content-Type', 'Authorization'])
 def image_upload():
+    """
+    receives an image, the user_id and current issue_id from the backend, evaluates the image using
+    a computer-vision model and updates the tiles and influence if the image was accepted
+    :return: 200 success if image was accepted, 500 if computer-vision model deems the image as unsatisfactory
+    """
     user_id = request.form["user_id"]
     issue_id = request.form["issue_id"]
     file = request.files.get('image')
     path = os.path.join('IMAGES_TO_EVAL/', file.filename)
     file.save(path)
     if evaluate_single_img(path, 'road-cls') == 'road':
-        issue = update_issue(int(issue_id), user_id)
+        issue = update_issue(issue_id, user_id)
         update_scores(issue, user_id)
+        user = get_user_by_id(user_id)
+        user["score"] = compute_user_total_score(user_id)
+        update_user(user)
         evaluate_single_img(path)
-        return {"message:" 'success'}, 200
+        return Response("{'message': 'success'}", status=200, mimetype='application/json')
     else:
-        return {'message': 'not a road'}, 400
+        return Response("{'message': 'not a road'}", status=400, mimetype='application/json')
+
+
+@app.route('/leaderboard', methods=['GET'])
+@cross_origin(origin='localhost', headers=['Content-Type', 'Authorization'])
+def get_leaderboard_scores():
+    """
+    accumulates all influence points for all tiles for each user
+    :return: returns the total (leaderboard) score for each user
+    """
+    tiles = get_all_tiles()
+    final_scores = {}
+    for tile in tiles:
+        scores = tile["scores"]
+        for user_id, score in scores.items():
+            if user_id in final_scores.keys():
+                final_scores[user_id] += score
+            else:
+                final_scores[user_id] = score
+    return jsonify(final_scores)
 
 
 if __name__ == '__main__':

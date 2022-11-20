@@ -7,10 +7,11 @@ def update_user(updated_user: {}) -> None:
     updates a users properties in the database
     :param updated_user: the user with the updated properties
     """
-    with open('data/users.json', "w") as f:
+    with open('data/users.json', "r") as f:
         users = json.load(f)
-        users = [u for u in users if u['id'] != updated_user["id"]]
-        users.append(updated_user)
+    users = [u for u in users if u['id'] != updated_user["id"]]
+    users.append(updated_user)
+    with open('data/users.json', "w") as f:
         json.dump(users, f)
     return None
 
@@ -44,7 +45,7 @@ def get_user_by_id(user_id: str) -> {}:
     """
     with open('data/users.json') as f:
         users = json.load(f)
-    user = list(filter(lambda u: u['id'] == int(user_id), users))[0]
+    user = list(filter(lambda u: u['id'] == user_id, users))[0]
     return user
 
 
