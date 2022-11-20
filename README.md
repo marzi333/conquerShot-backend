@@ -1,10 +1,10 @@
 # conquerShot-backend
 
-This is the repository of all backend implementation of the project **ConquerShot** for [hackaTUM 2022](https://hack.tum.de/), contributed by [Mariz Samir Awad](https://github.com/marzi333), [Johannes Getzner](https://github.com/JohannesGetzner), [Zhuoling Li](https://github.com/joelynli0110) and [Melanie Maier](https://github.com/mmmaier). The project is submitted for the challenge "Open Digital Earth Reconstruction" which is sponsored by Huawei. 
+This is the repository of all backend implementation of the project [**ConquerShot**](devpost.com/software/conquershot) for [hackaTUM 2022](https://hack.tum.de/), contributed by [Mariz Samir Awad](https://github.com/marzi333), [Johannes Getzner](https://github.com/JohannesGetzner), [Zhuoling Li](https://github.com/joelynli0110) and [Melanie Maier](https://github.com/mmmaier). The project is submitted for the challenge "Open Digital Earth Reconstruction" which is sponsored by Huawei. 
 
 ## ML Models for OSM Feature Classification
 
-All ML-related implementation is under ```./mlmodels``` , feel free to check out here:
+You can find all ML-related implementation under ```./mlmodels``` , feel free to check out there:
 
 ```
 cd ./mlmodels
@@ -22,7 +22,7 @@ pip install -r requirements.txt
 
 ### 2. Data Preparation
 
-The training and evaluation of the model is basically implemented with torchvision. In order to load and proceed data with torchvision, the data should be organized as follows:
+The training and evaluation of the model is basically implemented with [torchvision](https://pytorch.org/vision/stable/index.html). In order to load and proceed data with the library, the data should be organized as follows:
 
 ```
 <dataset_name>
@@ -43,7 +43,7 @@ The training and evaluation of the model is basically implemented with torchvisi
          └── xxx.jpg
 ```
 
-For binary classifier, we are provided the Huawei Challenge Dataset with following structure:
+For training the binary classifier for OSM features, we are provided the Huawei Challenge Dataset with following structure:
 
 ```
 <huawei_dataset>
@@ -66,6 +66,8 @@ The following command is used to transform the Huawei dataset into the required 
 ```
 python prepare_data.py --split <split>
 ```
+
+For training the classfier for road/non-road, we additionally sample the data from [MS-COCO dataset](https://cocodataset.org/#home) , with ensuring that a fair distribution of the training data (road and non-road). More details see [here](https://github.com/giddyyupp/coco-minitrain).
 
 
 
