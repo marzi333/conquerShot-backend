@@ -90,6 +90,20 @@ def eval_tile_winner(tile: {}) -> [str]:
         return [max(tile["scores"], key=tile["scores"].get)]
 
 
+def compute_user_total_score(user_id: str) -> int:
+    """
+    computes the users global overall score
+    :param user_id: the id of the user
+    :return: the total score
+    """
+    tiles = get_all_tiles()
+    total_score = 0
+    for tile in tiles:
+        if user_id in tile["scores"].keys():
+            total_score += tile["scores"][user_id]
+    return total_score
+
+
 def update_scores(issue: {}, user_id: str) -> None:
     """
     for a given issue, updates all relevant tiles if a new user submits an image
