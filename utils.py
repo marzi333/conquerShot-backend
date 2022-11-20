@@ -1,3 +1,5 @@
+import random
+
 import pandas as pd
 import json
 import math
@@ -52,7 +54,8 @@ def issues_csv_to_json() -> None:
             'longitude': row.longitude,
             'latitude': row.latitude,
             'image_id': str(row.image_id),
-            'submissions': []
+            'submissions': [],
+            'icon': random.choice(['tower','castle','village'])
         }
         issues.append(curr_issue)
     with open("data/issues.json", "w") as f:
@@ -137,3 +140,7 @@ def update_scores(issue: {}, user_id: str) -> None:
         if not found_duplicate:
             final_tiles.append(new_tile)
     save_tiles(stored_tiles + final_tiles)
+
+
+if __name__ == '__main__':
+    issues_csv_to_json()
