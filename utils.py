@@ -76,6 +76,23 @@ def get_neighbour_tiles(center: (int, int)) -> [(int, int, int)]:
     return neighbors
 
 
+def get_neigh_dist_without_corners(center):
+    """
+    same as previous function, but without corners
+    :param center: (x,y) coordinate
+    :return: a list of neighbour tuples of shape (x,y,dist_to_center)
+    """
+    neighbors = []
+    x, y = center
+    for i in range(-2,3):
+        for j in range(-2,3):
+            if (i == j == 2) or (i == j == -2) or (i == 2 and j == -2) or (i == -2 and j == 2):
+                continue
+            else:
+                neighbors.append((x + i,y + j,max(abs(i),abs(j))))
+    return neighbors
+
+
 def eval_tile_winner(tile: {}) -> [str]:
     """
     takes the user tile scores and returns the winner/tiles
@@ -133,7 +150,7 @@ def update_scores(issue: {}, user_id: str) -> None:
     updates are directly saved to the database
     """
     grid_location = deg2num(issue["latitude"], issue["longitude"], 16)
-    neighbours = get_neighbour_tiles(grid_location)
+    neighbours = get_neigh_dist_without_corners(grid_location)
     stored_tiles = get_all_tiles()
     new_tiles = []
     for x, y, dist in neighbours:
