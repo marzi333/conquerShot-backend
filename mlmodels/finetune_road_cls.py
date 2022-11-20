@@ -10,6 +10,7 @@ from torchvision import datasets, models, transforms
 import time
 import os
 import copy
+import argparse
 
 
 def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, is_inception=False):
@@ -115,9 +116,12 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
     return model_ft, input_size
 
 if __name__ == "__main__":
-    data_dir = "./road_dataset/"
-    model_name="resnet18"
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--backbone',type=str,default='resnet18')
+    args = parser.parse_args()
+    backbone = args.backbone
 
+    data_dir = "./road_dataset/"
     # General settings
     num_classes = 2
     batch_size = 8
@@ -128,7 +132,7 @@ if __name__ == "__main__":
     feature_extract = True
 
     # Initialize the model for this run
-    model_ft, input_size = initialize_model(model_name, num_classes, feature_extract, use_pretrained=True)
+    model_ft, input_size = initialize_model(backbone, num_classes, feature_extract, use_pretrained=True)
 
     # Print the model we just instantiated
     print(model_ft)
@@ -188,6 +192,6 @@ if __name__ == "__main__":
     criterion = nn.CrossEntropyLoss()
 
     # Train and evaluate
-    model_ft, hist = train_model(model_ft, dataloaders_dict, criterion, optimizer_ft, num_epochs=num_epochs, is_inception=(model_name=="inception"))
+    model_ft, hist = train_model(model_ft, dataloaders_dict, criterion, optimizer_ft, num_epochs=num_epochs, is_inception=(backbone=="inception"))
 
-    torch.save(model_ft, f'./road_cls_checkpoints/{model_name}_epoch{num_epochs}_{max(hist)}.pth')
+    torch.save(model_ft, f'./road_cls_checkpoints/{backbone}_epoch{num_epochs}_{max(hist)}.pth')
