@@ -119,6 +119,7 @@ def get_leaderboard_scores():
                 final_scores[user_id] += score
             else:
                 final_scores[user_id] = score
+    final_scores = {k: v for k, v in sorted(final_scores.items(), key=lambda item: item[1], reverse=True)}
     return jsonify(
         [{'user_id': user_id, 'score': score, 'user_name': get_user_by_id(user_id)['name']} for user_id, score in
          final_scores.items()])
