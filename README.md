@@ -87,7 +87,10 @@ as well as fine-tuning the model for OSM classification based on ```<backbone_na
 python finetune_osm_cls.py --backbone <backbone_name>
 ```
 
-The fine-tuned models will be saved under ```./checkpoints/```.  We also upload our trained models (in pth. format) for both road classification and OSM classification [here](https://github.com/marzi333/conquerShot-backend/tree/main/mlmodels/checkpoints).  
+The fine-tuned models will be saved under ```./checkpoints/```.  We also upload our trained models (in pth. format): 
+
+* Binary classifier for **road/non-road**: [road_cls_resnet18_epoch15_0.976.pth](https://github.com/marzi333/conquerShot-backend/blob/main/mlmodels/checkpoints/road_cls_resnet18_epoch15_0.976.pth)
+* OSM Feature classifier for **footway/primary**: [resnet18_epoch15_0.944.pth](https://github.com/marzi333/conquerShot-backend/blob/main/mlmodels/checkpoints/resnet18_epoch15_0.944.pth)
 
 
 
