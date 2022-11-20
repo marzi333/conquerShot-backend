@@ -61,7 +61,7 @@ For training the binary classifier for OSM features, we are provided the Huawei 
  |   └── issues.csv
 ```
 
-The following command is used to transform the Huawei dataset into the required structure (<split> can be train, val, issues, etc. ):
+The following command is used to transform the Huawei dataset into the required structure (```<split>``` can be train, val, issues, etc. ):
 
 ```
 python prepare_data.py --split <split>
